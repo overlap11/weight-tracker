@@ -99,10 +99,13 @@ h2, .stMarkdown h2{
 /* メトリックを flex カードにする */
 .metric-row{
     display:flex;
+    flex-wrap: nowrap;
     gap:1rem;
+    width: 100%;
 }
 .metric-card{
     flex:1 1 0;
+    min-width: 0;
     background:#f7f9fc;
     border:1px solid #e3e8ef;
     border-radius:8px;
