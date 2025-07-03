@@ -100,6 +100,14 @@ st.markdown("""
 [data-testid="metric-container"] > div:nth-child(3) {
     font-size: 0.7rem !important;
 }
+
+/* 値表示部分のスタイルを上書き */
+[data-testid="stMetricValue"]{
+    white-space:normal !important;   /* 折り返し可 */
+    overflow:visible !important;     /* はみ出しOK */
+    text-overflow:clip !important;   /* 省略記号を消す */
+    font-size:1rem !important;       /* ちょっと小さめに */
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -867,14 +875,8 @@ def main():
     # 4. データ編集セクション
     st.subheader("📋 データ編集・削除")
     
-    # 表示期間と連動した表示件数を設定
-    if period_days is None:  # 全期間の場合
-        display_count = None  # 全件数
-    else:
-        display_count = period_days  # 期間と同じ件数
-    
     try:
-        df_recent = db.get_measurements(display_count)  # 期間に応じた件数を取得
+        df_recent = db.get_measurements()  # 全件数を取得
         
         if not df_recent.empty:
             # 編集用データフレームの準備
@@ -890,11 +892,7 @@ def main():
             })
             
             # 編集可能なデータエディタ
-            if period_days is None:
-                period_text = "全期間"
-            else:
-                period_text = f"{period_days}日間"
-            st.info(f"💡 データをダブルクリックで編集できます。行を削除するには、行の左端にあるゴミ箱アイコンをクリックしてください。（{period_text}期間：{len(edit_df)}件表示中）")
+            st.info(f"💡 データをダブルクリックで編集できます。行を削除するには、行の左端にあるゴミ箱アイコンをクリックしてください。（全データ：{len(edit_df)}件表示中）")
             
             edited_df = st.data_editor(
                 edit_df[['日付', '体重(kg)', '体脂肪率(%)']],
