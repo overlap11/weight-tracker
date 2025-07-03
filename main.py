@@ -96,22 +96,16 @@ h2, .stMarkdown h2{
     margin-bottom: 0.4rem;
 }
 
-/* メトリックを flex カードにする */
-.metric-row{
-    display:flex;
-    flex-wrap: nowrap;
-    gap:1rem;
-    width: 100%;
-}
+/* メトリックカードのスタイル */
 .metric-card{
-    flex:1 1 0;
-    min-width: 0;
     background:#f7f9fc;
     border:1px solid #e3e8ef;
     border-radius:8px;
     padding:0.8rem 0.6rem;
     text-align:center;
     box-shadow:0 1px 3px rgba(0,0,0,0.04);
+    width: 100%;
+    margin-bottom: 0.5rem;
 }
 /* ラベルと値を太さ＆サイズで差別化 */
 .metric-label{
@@ -810,19 +804,18 @@ def main():
                 ("直近体脂肪率", f"{latest_data['body_fat']:.1f}%" if pd.notna(latest_data['body_fat']) else "未記録")
             ]
             
-            # flex 行のラッパを HTML で生成
-            st.markdown('<div class="metric-row">', unsafe_allow_html=True)
-            for label, value in metrics:
-                st.markdown(
+            # st.columns を使って統計情報カードを横並びにする
+            col_list = st.columns(len(metrics))
+            for col, (label, value) in zip(col_list, metrics):
+                col.markdown(
                     f"""
                     <div class="metric-card">
-                       <div class="metric-label">{label}</div>
-                       <div class="metric-value">{value}</div>
+                      <div class="metric-label">{label}</div>
+                      <div class="metric-value">{value}</div>
                     </div>
                     """,
                     unsafe_allow_html=True
                 )
-            st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.info("📝 データがありません。左側のフォームから記録を追加してください。")
     
