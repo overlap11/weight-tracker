@@ -24,7 +24,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 .main-header {
-    font-size: 2.5rem;
+    font-size: 2.0rem;
     font-weight: bold;
     color: #1f77b4;
     text-align: center;
@@ -65,48 +65,62 @@ st.markdown("""
     margin: 1rem 0;
 }
 
-/* 統計情報のメトリック表示を小さくする */
-.metric-container {
-    font-size: 0.85rem;
+
+
+/* 見出し（subheader）のサイズを小さくする */
+.stApp h3 {
+    font-size: 1.3rem !important;
+    margin-top: 1rem !important;
+    margin-bottom: 0.5rem !important;
 }
 
-.metric-container > div {
-    font-size: 0.85rem !important;
+/* データ項目名のヘッダーサイズも調整 */
+h3[data-testid="stHeader"] {
+    font-size: 1.3rem !important;
 }
 
-.metric-container [data-testid="metric-container"] {
-    font-size: 0.85rem !important;
+/* ブロック全体の上側余白を縮める */
+section.main > div.block-container{
+    padding-top: 1.5rem;
 }
 
-.metric-container [data-testid="metric-container"] > div {
-    font-size: 0.85rem !important;
+/* 見出し直下の余白を縮小 */
+.main-header{
+    margin-bottom: 0.8rem;
+    line-height: 1.2;
 }
 
-/* メトリック値のサイズを調整 */
-[data-testid="metric-container"] {
-    min-width: 100px;
+/* サブヘッダ全般も少し詰める */
+h2, .stMarkdown h2{
+    margin-top: 0.8rem;
+    margin-bottom: 0.4rem;
 }
 
-[data-testid="metric-container"] > div:first-child {
-    font-size: 0.9rem !important;
-    font-weight: 600;
+/* メトリックを flex カードにする */
+.metric-row{
+    display:flex;
+    gap:1rem;
 }
-
-[data-testid="metric-container"] > div:nth-child(2) {
-    font-size: 1.0rem !important;
-    font-weight: 500;
+.metric-card{
+    flex:1 1 0;
+    background:#f7f9fc;
+    border:1px solid #e3e8ef;
+    border-radius:8px;
+    padding:0.8rem 0.6rem;
+    text-align:center;
+    box-shadow:0 1px 3px rgba(0,0,0,0.04);
 }
-
-[data-testid="metric-container"] > div:nth-child(3) {
-    font-size: 0.7rem !important;
+/* ラベルと値を太さ＆サイズで差別化 */
+.metric-label{
+    font-size:0.75rem;
+    color:#555;
+    margin-bottom:0.2rem;
+    font-weight:600;
 }
-
-/* 値表示部分のスタイルを上書き */
-[data-testid="stMetricValue"]{
-    white-space:normal !important;   /* 折り返し可 */
-    overflow:visible !important;     /* はみ出しOK */
-    text-overflow:clip !important;   /* 省略記号を消す */
-    font-size:1rem !important;       /* ちょっと小さめに */
+.metric-value{
+    font-size:1.3rem;
+    font-weight:700;
+    color:#1f2937;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -781,43 +795,31 @@ def main():
             # 目標体重を取得
             target_weight = db.get_setting('target_weight')
             
-            # 統計情報を5カラムで表示
-            col1, col2, col3, col4, col5 = st.columns(5)
+            # 目標差分の計算
+            goal_diff = latest_data['weight'] - target_weight if target_weight is not None else None
             
-            with col1:
-                st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                st.metric("データ数", f"{len(df_all)}件")
-                st.markdown('</div>', unsafe_allow_html=True)
+            # 統計情報をカード風で表示
+            metrics = [
+                ("データ数", f"{len(df_all)}件"),
+                ("直近体重", f"{latest_data['weight']:.1f}kg"),
+                ("7日移動平均", f"{latest_ma:.1f}kg" if latest_ma is not None else "N/A"),
+                ("目標差分", f"{goal_diff:+.1f}kg" if goal_diff is not None else "未設定"),
+                ("直近体脂肪率", f"{latest_data['body_fat']:.1f}%" if pd.notna(latest_data['body_fat']) else "未記録")
+            ]
             
-            with col2:
-                st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                st.metric("直近体重", f"{latest_data['weight']:.1f}kg")
-                st.markdown('</div>', unsafe_allow_html=True)
-            
-            with col3:
-                st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                if latest_ma is not None:
-                    st.metric("7日移動平均", f"{latest_ma:.1f}kg")
-                else:
-                    st.metric("7日移動平均", "N/A")
-                st.markdown('</div>', unsafe_allow_html=True)
-            
-            with col4:
-                st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                if target_weight is not None:
-                    goal_diff = latest_data['weight'] - target_weight
-                    st.metric("目標差分", f"{goal_diff:+.1f}kg")
-                else:
-                    st.metric("目標差分", "未設定")
-                st.markdown('</div>', unsafe_allow_html=True)
-            
-            with col5:
-                st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                if pd.notna(latest_data['body_fat']):
-                    st.metric("直近体脂肪率", f"{latest_data['body_fat']:.1f}%")
-                else:
-                    st.metric("直近体脂肪率", "未記録")
-                st.markdown('</div>', unsafe_allow_html=True)
+            # flex 行のラッパを HTML で生成
+            st.markdown('<div class="metric-row">', unsafe_allow_html=True)
+            for label, value in metrics:
+                st.markdown(
+                    f"""
+                    <div class="metric-card">
+                       <div class="metric-label">{label}</div>
+                       <div class="metric-value">{value}</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+            st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.info("📝 データがありません。左側のフォームから記録を追加してください。")
     
