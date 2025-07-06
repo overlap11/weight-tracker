@@ -157,7 +157,9 @@ def validate_body_fat(body_fat: float) -> tuple[bool, str]:
 
 def validate_date(input_date: date) -> tuple[bool, str]:
     """日付の妥当性チェック"""
-    if input_date > date.today():
+    # 現在の日付を毎回取得
+    today = datetime.now().date()
+    if input_date > today:
         return False, "未来の日付は入力できません"
     return True, ""
 
@@ -371,10 +373,11 @@ def main():
         # 入力フォーム
         with st.form("weight_form"):
             # 日付入力
+            today = datetime.now().date()
             input_date = st.date_input(
                 "日付",
-                value=date.today(),
-                max_value=date.today(),
+                value=today,
+                max_value=today,
                 help="測定日を選択してください（未来の日付は選択できません）"
             )
             
