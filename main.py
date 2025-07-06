@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
 import plotly.graph_objects as go
 import plotly.express as px
 from database import WeightDatabase
@@ -134,6 +134,31 @@ COLOR_SCHEME = {
     'warning': '#ffc107'       # 警告メッセージ
 }
 
+def get_jst_now():
+    """JST（日本標準時）の現在の日付を取得"""
+    # システムの現在時刻を取得
+    now = datetime.now()
+    
+    # システムのタイムゾーンを取得
+    system_tz = now.astimezone().tzinfo
+    
+    # JST（日本標準時）のタイムゾーンを定義
+    JST = timezone(timedelta(hours=9))
+    
+    # システムのタイムゾーンオフセットを取得
+    system_offset = system_tz.utcoffset(now)
+    jst_offset = JST.utcoffset(now)
+    
+    # システムのタイムゾーンがJSTかどうかを判定
+    if system_offset == jst_offset:
+        # システムタイムゾーンがJSTの場合、そのまま使用
+        return now.date()
+    else:
+        # システムタイムゾーンがJST以外の場合、JSTに変換
+        jst_now = datetime.now(JST)
+        return jst_now.date()
+
+
 def init_database():
     """データベースの初期化"""
     try:
@@ -157,8 +182,8 @@ def validate_body_fat(body_fat: float) -> tuple[bool, str]:
 
 def validate_date(input_date: date) -> tuple[bool, str]:
     """日付の妥当性チェック"""
-    # 現在の日付を毎回取得
-    today = datetime.now().date()
+    # 現在の日付を毎回取得（JST）
+    today = get_jst_now()
     if input_date > today:
         return False, "未来の日付は入力できません"
     return True, ""
@@ -373,7 +398,7 @@ def main():
         # 入力フォーム
         with st.form("weight_form"):
             # 日付入力
-            today = datetime.now().date()
+            today = get_jst_now()
             input_date = st.date_input(
                 "日付",
                 value=today,
