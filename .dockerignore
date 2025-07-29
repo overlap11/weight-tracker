@@ -1,0 +1,42 @@
+# Git関連
+.git
+.gitignore
+
+# Python関連
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+
+# エディタ関連
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS関連
+.DS_Store
+Thumbs.db
+
+# ドキュメント
+README.md
+doc/
+
+# テスト
+test/
+
+# 開発用Docker設定
+.devcontainer/
+
+# データベース（永続化のためホストでマウント）
+data/*.db
+
+# 環境ファイル
+.env* 
