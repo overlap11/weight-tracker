@@ -9,7 +9,7 @@ services:
     ports:
       - "8501:8501"  # Streamlitアプリ用ポート
     volumes:
-      - ./data:/app/data  # データベース永続化
+      - data:/app/data  # データベース永続化（named volume）
       - ./sample_data:/app/sample_data  # サンプルデータ
     environment:
       - STREAMLIT_SERVER_HEADLESS=true
@@ -21,4 +21,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s 
+      start_period: 40s
+
+volumes:
+  data:
+    driver: local 

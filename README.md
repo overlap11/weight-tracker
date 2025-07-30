@@ -19,7 +19,23 @@
 - Python 3.10以上
 - ブラウザ（Chrome, Firefox, Safari, Edge）
 
-### 2. インストール
+### 2. インストール・実行方法
+
+#### 方法1: Docker実行（推奨）
+
+```bash
+# リポジトリをクローン（または展開）
+cd weight-tracker
+
+# Dockerコンテナでアプリを起動
+docker-compose up --build
+
+# ブラウザで http://localhost:8501 にアクセス
+```
+
+詳細な手順は `DOCKER_USAGE.md` を参照してください。
+
+#### 方法2: Python直接実行
 
 ```bash
 # リポジトリをクローン（または展開）
@@ -36,11 +52,7 @@ source venv/bin/activate
 
 # 依存関係をインストール
 pip install -r requirements.txt
-```
 
-### 3. 実行
-
-```bash
 # アプリケーションを起動
 streamlit run main.py
 ```
@@ -56,6 +68,10 @@ weight-tracker/
 ├── requirements.txt        # 依存関係
 ├── README.md              # このファイル
 ├── .gitignore             # Git除外設定
+├── Dockerfile             # Dockerイメージ定義
+├── docker-compose.yaml    # Docker Compose設定
+├── .dockerignore          # Docker除外設定
+├── DOCKER_USAGE.md        # Docker実行手順
 ├── data/                  # データ格納フォルダ
 │   ├── .gitkeep          # フォルダ保持用ファイル
 │   └── data.db           # SQLiteデータベース（自動生成）
