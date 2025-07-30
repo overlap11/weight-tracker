@@ -57,4 +57,16 @@ Thumbs.db
 
 # Data files (keep structure but ignore actual data)
 data/*.db
-!data/.gitkeep 
+!data/.gitkeep
+
+# Backup and archive files
+*.backup
+*.bak
+*.tar
+*.tar.gz
+*.tar.bz2
+*.zip
+*.rar
+*.7z
+weight_tracker_backup.*
+*_backup.* 
